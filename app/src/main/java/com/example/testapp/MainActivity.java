@@ -280,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 mmSocket.close();
             } catch (IOException e) { }
+            //this is a comment
         }
     }
 
