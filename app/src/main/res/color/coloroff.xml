@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <coloroff name="colorPrimary">#6200EE</coloroff>
+    <coloroff name="colorPrimaryDark">#3700B3</coloroff>
+    <coloroff name="colorAccent">#03DAC5</coloroff>
+    <coloroff name="colorOff">#000000</coloroff>
+    <coloroff name="colorOn">#FF8800</coloroff>
+
+
+</selector>
