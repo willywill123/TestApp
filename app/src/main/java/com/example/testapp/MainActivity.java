@@ -36,9 +36,9 @@ public class MainActivity extends AppCompatActivity {
     private String deviceName = null;
     private String deviceAddress;
     public static Handler handler;
-    //public static BluetoothSocket mmSocket;
-    //public static ConnectedThread connectedThread;
-    //public static CreateConnectThread createConnectThread;
+    public static BluetoothSocket mmSocket;
+    public static ConnectedThread connectedThread;
+    public static CreateConnectThread createConnectThread;
 
     private final static int CONNECTING_STATUS = 1; // used in bluetooth handler to identify message status
     private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
@@ -53,15 +53,21 @@ public class MainActivity extends AppCompatActivity {
         final Toolbar toolbar = findViewById(R.id.toolbar);
         final ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.GONE);
-        final TextView textViewInfo = findViewById(R.id.textViewInfo);
-        final Button buttonToggle = findViewById(R.id.buttonToggle);
+        //final TextView textViewInfo = findViewById(R.id.textViewInfo);
+        final TextView updateKey = findViewById(R.id.updateKey);
+        updateKey.setVisibility(View.GONE);
+
+        //final Button buttonToggle = findViewById(R.id.buttonToggle);
         final Button keyTestButton = findViewById(R.id.keyTestButton);
-        keyTestButton.setEnabled(true);
-        buttonToggle.setEnabled(false);
+        keyTestButton.setEnabled(false);
+        final Button returnButton = findViewById(R.id.returnButton);
+        returnButton.setEnabled(false);
+        //buttonToggle.setEnabled(false);
         final Button typingTestButton = findViewById(R.id.typingTestButton);
-        typingTestButton.setEnabled(true);
-        final ImageView imageView = findViewById(R.id.imageView);
-        imageView.setBackgroundColor(Color.BLACK);
+        typingTestButton.setEnabled(false);
+        //final TextView updateKey = findViewById(R.id.updateKey);
+        //final ImageView imageView = findViewById(R.id.imageView);
+        //imageView.setBackgroundColor(Color.BLACK);
 
         // If a bluetooth device has been selected from SelectDeviceActivity
         deviceName = getIntent().getStringExtra("deviceName");
@@ -78,9 +84,9 @@ public class MainActivity extends AppCompatActivity {
             the code will call a new thread to create a bluetooth connection to the
             selected device (see the thread code below)
              */
-            //BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            //createConnectThread = new CreateConnectThread(bluetoothAdapter,deviceAddress);
-            //createConnectThread.start();
+            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            createConnectThread = new CreateConnectThread(bluetoothAdapter,deviceAddress);
+            createConnectThread.start();
         }
 
         /*
@@ -96,9 +102,10 @@ public class MainActivity extends AppCompatActivity {
                                 toolbar.setSubtitle("Connected to " + deviceName);
                                 progressBar.setVisibility(View.GONE);
                                 buttonConnect.setEnabled(true);
-                                buttonToggle.setEnabled(true);
+                                //buttonToggle.setEnabled(true);
                                 keyTestButton.setEnabled(true);
                                 typingTestButton.setEnabled(true);
+
 
                                 break;
                             case -1:
@@ -118,17 +125,10 @@ public class MainActivity extends AppCompatActivity {
                         int duration = Toast.LENGTH_SHORT;
                         Toast toast = Toast.makeText(context, text, duration);
                         toast.show();*/
-                        switch (arduinoMsg.toLowerCase()){
-                            case "led is turned on":
-                                imageView.setBackgroundColor(Color.YELLOW);
-                                textViewInfo.setText("Arduino Message : " + arduinoMsg);
+                        //updateKey = (TextView)findViewById(R.id.updateKey);
 
-                                break;
-                            case "led is turned off":
-                                imageView.setBackgroundColor(Color.BLACK);
-                                textViewInfo.setText("Arduino Message : " + arduinoMsg);
-                                break;
-                        }
+                        updateKey.setText(arduinoMsg);
+                        //updateKey.setText(arduinoMsg);
                         break;
                 }
             }
@@ -144,61 +144,57 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Button to ON/OFF LED on Arduino Board
-        buttonToggle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String cmdText = null;
-                String btnState = buttonToggle.getText().toString().toLowerCase();
-                switch (btnState){
-                    case "turn on":
-                        buttonToggle.setText("Turn Off");
-                        // Command to turn on LED on Arduino. Must match with the command in Arduino code
-                        cmdText = "<turn on>";
-                        break;
-                    case "turn off":
-                        buttonToggle.setText("Turn On");
-                        // Command to turn off LED on Arduino. Must match with the command in Arduino code
-                        cmdText = "<turn off>";
-                        break;
-                }
-                // Send command to Arduino board
-                //connectedThread.write(cmdText);
-            }
-        });
+
         //go to key test screen
         keyTestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), KeyTestActivity.class);
-                /*Context context = getApplicationContext();
+                /*Intent intent = new Intent(view.getContext(), KeyTestActivity.class);
+                Context context = getApplicationContext();
                 CharSequence text = "hello world";
                 int duration = Toast.LENGTH_SHORT;
                 Toast toast = Toast.makeText(context, text, duration);
-                toast.show();*/
-                startActivity(intent);
+                toast.show();
+                startActivity(intent);*/
+                updateKey.setVisibility(View.VISIBLE);
+                keyTestButton.setEnabled(false);
+                typingTestButton.setEnabled(false);
+                returnButton.setEnabled(true);
                 }
         });
         //go to typing test
         typingTestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), TypingTestActivity.class);
-                startActivity(intent);
+                returnButton.setEnabled(true);
+                keyTestButton.setEnabled(false);
+                typingTestButton.setEnabled(false);
+
+            }
+        });
+
+        returnButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                returnButton.setEnabled(false);
+                keyTestButton.setEnabled(true);
+                typingTestButton.setEnabled(true);
+                updateKey.setVisibility(View.GONE);
+
             }
         });
 
     }
 
     /* ============================ Thread to Create Bluetooth Connection =================================== */
-    /*public static class CreateConnectThread extends Thread {
+    public static class CreateConnectThread extends Thread {
 
         public CreateConnectThread(BluetoothAdapter bluetoothAdapter, String address) {
             /*
             Use a temporary object that is later assigned to mmSocket
             because mmSocket is final.
              */
-           /* BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
+            BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
             BluetoothSocket tmp = null;
             UUID uuid = bluetoothDevice.getUuids()[0].getUuid();
 
@@ -209,15 +205,14 @@ public class MainActivity extends AppCompatActivity {
                 You should try using other methods i.e. :
                 tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
                  */
-    /*
                 tmp = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
 
             } catch (IOException e) {
                 Log.e(TAG, "Socket's create() method failed", e);
             }
-            //mmSocket = tmp;
+            mmSocket = tmp;
         }
-/*
+
         public void run() {
             // Cancel discovery because it otherwise slows down the connection.
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -225,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 // Connect to the remote device through the socket. This call blocks
                 // until it succeeds or throws an exception.
-                //mmSocket.connect();
+                mmSocket.connect();
                 Log.e("Status", "Device connected");
                 handler.obtainMessage(CONNECTING_STATUS, 1, -1).sendToTarget();
             } catch (IOException connectException) {
@@ -257,7 +252,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /* =============================== Thread for Data Transfer =========================================== */
-    /*
     public static class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
@@ -278,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
         }
-    /*
+
         public void run() {
             byte[] buffer = new byte[1024];  // buffer store for the stream
             int bytes = 0; // bytes returned from read()
@@ -289,7 +283,6 @@ public class MainActivity extends AppCompatActivity {
                     Read from the InputStream from Arduino until termination character is reached.
                     Then send the whole String message to GUI Handler.
                      */
-        /*
                     buffer[bytes] = (byte) mmInStream.read();
                     String readMessage;
                     if (buffer[bytes] == '\n'){
@@ -308,26 +301,26 @@ public class MainActivity extends AppCompatActivity {
         }
 
         /* Call this from the main activity to send data to the remote device */
-        /*public void write(String input) {
+        public void write(String input) {
             byte[] bytes = input.getBytes(); //converts entered String into bytes
             try {
                 mmOutStream.write(bytes);
             } catch (IOException e) {
                 Log.e("Send Error","Unable to send message",e);
             }
-        }*/
+        }
 
         /* Call this from the main activity to shutdown the connection */
-        /*public void cancel() {
+        public void cancel() {
             try {
                 mmSocket.close();
             } catch (IOException e) { }
             //this is a comment
         }
-    }*/
+    }
 
     /* ============================ Terminate Connection at BackPress ====================== */
-    /*@Override
+    @Override
     public void onBackPressed() {
         // Terminate Bluetooth Connection and close app
         if (createConnectThread != null){
@@ -337,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
         a.addCategory(Intent.CATEGORY_HOME);
         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(a);
-    }*/
+    }
 }
 
 
