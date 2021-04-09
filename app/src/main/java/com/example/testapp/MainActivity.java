@@ -53,7 +53,11 @@ public class MainActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
         final TextView textViewInfo = findViewById(R.id.textViewInfo);
         final Button buttonToggle = findViewById(R.id.buttonToggle);
+        final Button keyTestButton = findViewById(R.id.keyTestButton);
+        keyTestButton.setEnabled(false);
         buttonToggle.setEnabled(false);
+        final Button typingTestButton = findViewById(R.id.typingTestButton);
+        typingTestButton.setEnabled(false);
         final ImageView imageView = findViewById(R.id.imageView);
         imageView.setBackgroundColor(Color.BLACK);
 
@@ -91,11 +95,14 @@ public class MainActivity extends AppCompatActivity {
                                 progressBar.setVisibility(View.GONE);
                                 buttonConnect.setEnabled(true);
                                 buttonToggle.setEnabled(true);
+                                keyTestButton.setEnabled(true);
+                                typingTestButton.setEnabled(true);
                                 break;
                             case -1:
                                 toolbar.setSubtitle("Device fails to connect");
                                 progressBar.setVisibility(View.GONE);
-                                buttonConnect.setEnabled(true);
+                                //buttonConnect.setEnabled(true);
+                                keyTestButton.setEnabled(true);
                                 break;
                         }
                         break;
@@ -149,6 +156,21 @@ public class MainActivity extends AppCompatActivity {
                 connectedThread.write(cmdText);
             }
         });
+        keyTestButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), KeyTestActivity.class);
+                startActivity(intent);
+                }
+        });
+        typingTestButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), TypingTestActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     /* ============================ Thread to Create Bluetooth Connection =================================== */
