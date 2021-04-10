@@ -283,8 +283,14 @@ public class MainActivity extends AppCompatActivity {
                     Read from the InputStream from Arduino until termination character is reached.
                     Then send the whole String message to GUI Handler.
                      */
+
+                    // IoT: Changed bluetooth behavior to always send latest input data, regardless
+                    // of new line character.
+                    char buf = (char) mmInStream.read();
+                    String readMessage = String.valueOf(buf);
+                    handler.obtainMessage(MESSAGE_READ,readMessage).sendToTarget();
+                    /*
                     buffer[bytes] = (byte) mmInStream.read();
-                    String readMessage;
                     if (buffer[bytes] == '\n'){
                         readMessage = new String(buffer,0,bytes);
                         Log.e("Arduino Message",readMessage);
@@ -293,6 +299,8 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         bytes++;
                     }
+
+                    */
                 } catch (IOException e) {
                     e.printStackTrace();
                     break;
