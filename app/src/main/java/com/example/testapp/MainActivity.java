@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                         toast.show();*/
                         //updateKey = (TextView)findViewById(R.id.updateKey);
 
-                        updateKey.setText(arduinoMsg);
+                        updateKey.setText(String.format("You pressed the %s key.", arduinoMsg));
                         //updateKey.setText(arduinoMsg);
                         break;
                 }
