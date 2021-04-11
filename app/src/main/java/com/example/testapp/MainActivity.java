@@ -126,8 +126,14 @@ public class MainActivity extends AppCompatActivity {
                         Toast toast = Toast.makeText(context, text, duration);
                         toast.show();*/
                         //updateKey = (TextView)findViewById(R.id.updateKey);
-
-                        updateKey.setText(String.format("You pressed the %s key.", arduinoMsg));
+                        int convertedmsg = Integer.valueOf(arduinoMsg);
+                        if (convertedmsg == 0x7F)
+                        {
+                            updateKey.setText("You pressed the DEL key.");
+                        }
+                        else {
+                            updateKey.setText(String.format("You pressed the %s key.", arduinoMsg.charAt(0)));
+                        }
                         //updateKey.setText(arduinoMsg);
                         break;
                 }
