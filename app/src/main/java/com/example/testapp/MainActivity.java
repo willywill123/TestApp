@@ -1,33 +1,30 @@
 package com.example.testapp;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
+import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
 
@@ -42,6 +39,11 @@ public class MainActivity extends AppCompatActivity {
 
     private final static int CONNECTING_STATUS = 1; // used in bluetooth handler to identify message status
     private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
+    private static boolean IN_KEYTEST = false;
+    private static boolean IN_TYPETEST = false;
+    private static String typeText = "The quick brown fox jumped over the lazy dog.";
+    ArrayList<String> typeTextArr = new ArrayList<String>();
+    private static int counter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,11 @@ public class MainActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
         //final TextView textViewInfo = findViewById(R.id.textViewInfo);
         final TextView updateKey = findViewById(R.id.updateKey);
+        final TextView connectText = findViewById(R.id.connectText);
+        final TextView typingTestText = findViewById(R.id.typingTestText);
+        final TextView typingTestText2 = findViewById(R.id.typingTestText2);
+        typingTestText2.setVisibility(View.GONE);
+        typingTestText.setVisibility(View.GONE);
         updateKey.setVisibility(View.GONE);
 
         //final Button buttonToggle = findViewById(R.id.buttonToggle);
@@ -105,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
                                 //buttonToggle.setEnabled(true);
                                 keyTestButton.setEnabled(true);
                                 typingTestButton.setEnabled(true);
+                                connectText.setVisibility(View.GONE);
 
 
                                 break;
@@ -127,21 +135,52 @@ public class MainActivity extends AppCompatActivity {
                         toast.show();*/
                         //updateKey = (TextView)findViewById(R.id.updateKey);
                         //int convertedmsg = Integer.valueOf(arduinoMsg);
+
                         if (!arduinoMsg.isEmpty())
                         {
-                            if (arduinoMsg.charAt(0) == 0x08)
+                            if (IN_TYPETEST)
                             {
-                                updateKey.setText("You pressed the backspace key.");
+                                //typeText;
+                                //typeTextArr;
+                                if (typeText.charAt(counter) == arduinoMsg.charAt(0))
+                                {
+
+                                    String next = "<font color = '#000000'>" + typeText.charAt(counter) + "</font>";
+                                    typeTextArr.add(next);
+
+                                }
+                                else {
+                                    String next = "<font color = '#EE0000'>" + typeText.charAt(counter) + "</font>";
+                                    typeTextArr.add(next);
+                                }
+                                String build = "";
+                                for (String c: typeTextArr)
+                                {
+                                    build += c;
+                                }
+                                counter++;
+                                typingTestText.setText(Html.fromHtml(build));
                             }
-                            //else if (convertedmsg == 0x08fe)
-                            //{
-                            //    updateKey.setText("You pressed the DEL key.");
-                            //}
-                            else {
-                            updateKey.setText(String.format("You pressed the %s key.", arduinoMsg));
+                            if (IN_KEYTEST) {
+
+
+                                if (arduinoMsg.charAt(0) == 0x08) {
+                                    updateKey.setText("You pressed the BACKSPACE key.");
+                                } else if (arduinoMsg.charAt(0) == 0x09) {
+                                    updateKey.setText("You pressed the TAB key.");
+                                } else if (arduinoMsg.charAt(0) == 0x1B) {
+                                    updateKey.setText("You pressed the ESC key.");
+                                } else if (arduinoMsg.charAt(0) == 0x20) {
+                                    updateKey.setText("You pressed the SPACE key.");
+                                } else if (arduinoMsg.charAt(0) == 0x0D) {
+                                    updateKey.setText("You pressed the ENTER key.");
+                                } else {
+                                    updateKey.setText(String.format("You pressed the %s key.", arduinoMsg));
+                                }
+                                //updateKey.setText(arduinoMsg);
                             }
-                            //updateKey.setText(arduinoMsg);
                         }
+
                         //updateKey.setText(arduinoMsg);
                         break;
                 }
@@ -174,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
                 keyTestButton.setEnabled(false);
                 typingTestButton.setEnabled(false);
                 returnButton.setEnabled(true);
+                IN_KEYTEST = true;
                 }
         });
         //go to typing test
@@ -183,6 +223,18 @@ public class MainActivity extends AppCompatActivity {
                 returnButton.setEnabled(true);
                 keyTestButton.setEnabled(false);
                 typingTestButton.setEnabled(false);
+                typingTestText.setVisibility(View.VISIBLE);
+                typingTestText2.setVisibility(View.VISIBLE);
+                IN_TYPETEST = true;
+                counter = 0;
+                //Color.parseColor("#bdbdbd");
+
+                //String first = "<font color = '#EEFFBB'>This text is </font>";
+
+                //String next = "<font color = '#EE0000'>red</font>";
+                //typingTestText.setText(Html.fromHtml(first + next));
+                //typingTestText.setTextColor(Color.parseColor("#bdbdbd"));
+
 
             }
         });
@@ -194,6 +246,10 @@ public class MainActivity extends AppCompatActivity {
                 keyTestButton.setEnabled(true);
                 typingTestButton.setEnabled(true);
                 updateKey.setVisibility(View.GONE);
+                typingTestText.setVisibility(View.GONE);
+                typingTestText2.setVisibility(View.GONE);
+                IN_KEYTEST = false;
+                IN_TYPETEST = false;
 
             }
         });

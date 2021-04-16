@@ -8,6 +8,20 @@
     android:background="@android:color/background_light"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/updateKey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Press any key."
+        android:textColor="#3F51B5"
+        android:textSize="26sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.248" />
+
     <Button
         android:id="@+id/keyTestButton"
         style="@style/Widget.AppCompat.Button.Colored"
@@ -17,9 +31,10 @@
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.545"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/toolbar" />
+        app:layout_constraintTop_toTopOf="@+id/toolbar"
+        app:layout_constraintVertical_bias="0.499" />
 
     <Button
         android:id="@+id/returnButton"
@@ -33,7 +48,7 @@
         app:layout_constraintHorizontal_bias="0.075"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/toolbar"
-        app:layout_constraintVertical_bias="0.944" />
+        app:layout_constraintVertical_bias="0.955" />
 
     <Button
         android:id="@+id/typingTestButton"
@@ -87,17 +102,72 @@
         app:layout_constraintVertical_bias="0.112" />
 
     <TextView
-        android:id="@+id/updateKey"
+        android:id="@+id/connectText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
+        android:text="Connect to a device."
         android:textColor="#3F51B5"
-        android:textSize="30sp"
+        android:textSize="26sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.248" />
+        app:layout_constraintVertical_bias="0.129" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:layout_marginTop="356dp"
+        android:contentDescription="Keyboard"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintVertical_bias="0.171"
+        app:srcCompat="@drawable/keyboard"
+        tools:ignore="VectorDrawableCompat" />
+
+
+    <TextView
+        android:id="@+id/typingTestText2"
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:fontFamily="serif-monospace"
+        android:text="The quick brown fox jumped over the lazy dog."
+        android:textColor="#8C8C8C"
+        android:textSize="26sp"
+        android:gravity="top"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/toolbar"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintVertical_weight="1"
+
+        app:layout_constraintVertical_bias="0.300" />
+
+
+    <TextView
+        android:id="@+id/typingTestText"
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:fontFamily="serif-monospace"
+        android:text="The quick brown fox jumped over the lazy dog."
+        android:textColor="#8C8C8C"
+        android:textSize="26sp"
+        android:gravity="top"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/toolbar"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintVertical_weight="1"
+
+        app:layout_constraintVertical_bias="0.300" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
