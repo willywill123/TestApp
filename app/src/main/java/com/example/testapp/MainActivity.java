@@ -16,9 +16,12 @@ import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +30,8 @@ import java.util.UUID;
 import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
+
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,7 +49,26 @@ public class MainActivity extends AppCompatActivity {
     private static String typeText = "The quick brown fox jumped over the lazy dog.";
     ArrayList<String> typeTextArr = new ArrayList<String>();
     private static int counter = 0;
+    double avgChar = 0.0;
 
+    public static double calculateSpeed(String textstring) {
+        int charCounter = 0;
+        int spaceCounter = 0;
+        for (int i = 0; i < textstring.length(); i++)
+        {
+            if (textstring.charAt(i) == ' ')
+            {
+                spaceCounter++;
+            }
+            else
+            {
+                charCounter++;
+            }
+        }
+        double avgChar = (double)charCounter/(double)spaceCounter;
+        return avgChar;
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,9 +84,13 @@ public class MainActivity extends AppCompatActivity {
         final TextView connectText = findViewById(R.id.connectText);
         final TextView typingTestText = findViewById(R.id.typingTestText);
         final TextView typingTestText2 = findViewById(R.id.typingTestText2);
+        final TextView typingSpeed = findViewById(R.id.typingSpeed);
+        final ImageView keyboard = findViewById(R.id.keyboard);
         typingTestText2.setVisibility(View.GONE);
         typingTestText.setVisibility(View.GONE);
+        typingSpeed.setVisibility(View.GONE);
         updateKey.setVisibility(View.GONE);
+
 
         //final Button buttonToggle = findViewById(R.id.buttonToggle);
         final Button keyTestButton = findViewById(R.id.keyTestButton);
@@ -72,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
         //buttonToggle.setEnabled(false);
         final Button typingTestButton = findViewById(R.id.typingTestButton);
         typingTestButton.setEnabled(false);
+        //double avgChar = 0.0;
+
         //final TextView updateKey = findViewById(R.id.updateKey);
         //final ImageView imageView = findViewById(R.id.imageView);
         //imageView.setBackgroundColor(Color.BLACK);
@@ -225,8 +255,13 @@ public class MainActivity extends AppCompatActivity {
                 typingTestButton.setEnabled(false);
                 typingTestText.setVisibility(View.VISIBLE);
                 typingTestText2.setVisibility(View.VISIBLE);
+                typingSpeed.setVisibility(View.VISIBLE);
+                keyboard.setVisibility(View.GONE);
                 IN_TYPETEST = true;
+                avgChar =calculateSpeed(typeText);
+                typingSpeed.setText(Double.toString(avgChar) + " WPM");
                 counter = 0;
+
                 //Color.parseColor("#bdbdbd");
 
                 //String first = "<font color = '#EEFFBB'>This text is </font>";
@@ -239,6 +274,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
         returnButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -248,6 +285,8 @@ public class MainActivity extends AppCompatActivity {
                 updateKey.setVisibility(View.GONE);
                 typingTestText.setVisibility(View.GONE);
                 typingTestText2.setVisibility(View.GONE);
+                keyboard.setVisibility(View.VISIBLE);
+                typingSpeed.setVisibility(View.GONE);
                 IN_KEYTEST = false;
                 IN_TYPETEST = false;
 
