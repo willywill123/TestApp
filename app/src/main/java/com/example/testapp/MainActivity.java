@@ -126,13 +126,21 @@ public class MainActivity extends AppCompatActivity {
                         Toast toast = Toast.makeText(context, text, duration);
                         toast.show();*/
                         //updateKey = (TextView)findViewById(R.id.updateKey);
-                        int convertedmsg = Integer.valueOf(arduinoMsg);
-                        if (convertedmsg == 0x7F)
+                        //int convertedmsg = Integer.valueOf(arduinoMsg);
+                        if (!arduinoMsg.isEmpty())
                         {
-                            updateKey.setText("You pressed the DEL key.");
-                        }
-                        else {
-                            updateKey.setText(String.format("You pressed the %s key.", arduinoMsg.charAt(0)));
+                            if (arduinoMsg.charAt(0) == 0x08)
+                            {
+                                updateKey.setText("You pressed the backspace key.");
+                            }
+                            //else if (convertedmsg == 0x08fe)
+                            //{
+                            //    updateKey.setText("You pressed the DEL key.");
+                            //}
+                            else {
+                            updateKey.setText(String.format("You pressed the %s key.", arduinoMsg));
+                            }
+                            //updateKey.setText(arduinoMsg);
                         }
                         //updateKey.setText(arduinoMsg);
                         break;
