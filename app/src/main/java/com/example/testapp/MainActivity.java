@@ -12,10 +12,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,6 +28,9 @@ import org.w3c.dom.Text;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.UUID;
 import java.util.ArrayList;
 
@@ -46,10 +51,13 @@ public class MainActivity extends AppCompatActivity {
     private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
     private static boolean IN_KEYTEST = false;
     private static boolean IN_TYPETEST = false;
+    private static boolean TYPETEST_FINISH = false;
     private static String typeText = "The quick brown fox jumped over the lazy dog.";
     ArrayList<String> typeTextArr = new ArrayList<String>();
     private static int counter = 0;
+    private static int char_counter = 0;
     double avgChar = 0.0;
+    boolean startChrono = false;
 
     public static double calculateSpeed(String textstring) {
         int charCounter = 0;
@@ -69,6 +77,17 @@ public class MainActivity extends AppCompatActivity {
         return avgChar;
 
     }
+
+    public static String formatToSignificant(double value,
+                                             int significant)
+    {
+        MathContext mathContext = new MathContext(significant,
+                RoundingMode.DOWN);
+        BigDecimal bigDecimal = new BigDecimal(value,
+                mathContext);
+        return bigDecimal.toPlainString();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +95,9 @@ public class MainActivity extends AppCompatActivity {
 
         // UI Initialization
         final Button buttonConnect = findViewById(R.id.buttonConnect);
+
+        Chronometer wpmChrono = (Chronometer) findViewById(R.id.wpmChrono);
+        wpmChrono.setVisibility(View.GONE);
         final Toolbar toolbar = findViewById(R.id.toolbar);
         final ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.GONE);
@@ -143,8 +165,6 @@ public class MainActivity extends AppCompatActivity {
                                 keyTestButton.setEnabled(true);
                                 typingTestButton.setEnabled(true);
                                 connectText.setVisibility(View.GONE);
-
-
                                 break;
                             case -1:
                                 toolbar.setSubtitle("Device fails to connect");
@@ -170,26 +190,48 @@ public class MainActivity extends AppCompatActivity {
                         {
                             if (IN_TYPETEST)
                             {
+                                if (!startChrono)
+                                {
+                                    startChrono = true;
+                                    wpmChrono.setBase(SystemClock.elapsedRealtime());
+                                    wpmChrono.start();
+                                }
+
                                 //typeText;
                                 //typeTextArr;
-                                if (typeText.charAt(counter) == arduinoMsg.charAt(0))
-                                {
+                                if (!TYPETEST_FINISH) {
+                                    if (typeText.charAt(counter) == arduinoMsg.charAt(0)) {
 
-                                    String next = "<font color = '#000000'>" + typeText.charAt(counter) + "</font>";
-                                    typeTextArr.add(next);
+                                        String next = "<font color = '#000000'>" + typeText.charAt(counter) + "</font>";
+                                        typeTextArr.add(next);
+
+                                    } else {
+                                        String next = "<font color = '#EE0000'>" + typeText.charAt(counter) + "</font>";
+                                        typeTextArr.add(next);
+                                    }
+
+                                    if (arduinoMsg.charAt(0) != 0x20) char_counter++;
+                                    String build = "";
+                                    for (String c : typeTextArr) {
+                                        build += c;
+                                    }
+                                    int buildLen = build.length() / 32;
+                                    // Calculate approximate WPM
+                                    //double wpm = (double) char_counter / ((double) wpmChrono.getBase()/1000);
+                                    double wpm = (SystemClock.elapsedRealtime() - wpmChrono.getBase()) / 1000;
+                                    wpm = (double) ((char_counter / avgChar) / wpm) * 60;
+                                    //String s_wpm = formatToSignificant(wpm,3);
+
+                                    counter++;
+                                    typingTestText.setText(Html.fromHtml(build));
+                                    if (buildLen == typeText.length()) {
+                                        TYPETEST_FINISH = true;
+                                        wpmChrono.stop();
+                                    }
+                                    typingSpeed.setText(String.valueOf((int) wpm) + " WPM");
 
                                 }
-                                else {
-                                    String next = "<font color = '#EE0000'>" + typeText.charAt(counter) + "</font>";
-                                    typeTextArr.add(next);
-                                }
-                                String build = "";
-                                for (String c: typeTextArr)
-                                {
-                                    build += c;
-                                }
-                                counter++;
-                                typingTestText.setText(Html.fromHtml(build));
+                                //typingSpeed.setText(Integer.toString(build.length()/32));
                             }
                             if (IN_KEYTEST) {
 
@@ -259,8 +301,11 @@ public class MainActivity extends AppCompatActivity {
                 keyboard.setVisibility(View.GONE);
                 IN_TYPETEST = true;
                 avgChar =calculateSpeed(typeText);
-                typingSpeed.setText(Double.toString(avgChar) + " WPM");
+                typingSpeed.setText(" WPM");
+                wpmChrono.setVisibility(View.VISIBLE);
                 counter = 0;
+                startChrono = false;
+                char_counter = 0;
 
                 //Color.parseColor("#bdbdbd");
 
@@ -275,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
+        // Return key
         returnButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -289,6 +334,9 @@ public class MainActivity extends AppCompatActivity {
                 typingSpeed.setVisibility(View.GONE);
                 IN_KEYTEST = false;
                 IN_TYPETEST = false;
+                TYPETEST_FINISH = false;
+                wpmChrono.setVisibility(View.GONE);
+                wpmChrono.stop();
 
             }
         });
